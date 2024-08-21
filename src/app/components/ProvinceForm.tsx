@@ -5,9 +5,13 @@ function ProvinceForm({ country }: { country: string }) {
     const [city, setCity] = useState("");
     const [errors, setErrors] = useState({ province: "", city: "" });
     const [provinceData, setProvinceData] = useState<{ [key: string]: string[] }>({});
-
+    const [weatherData, setWeatherData] = useState(null);
+    const [error, setError] = useState("");
+   
+    
     useEffect(() => {
-        // Fetch the JSON data when the component mounts
+        //state and city data is fetched from data.json 
+        //for validation purpose
         fetch("/data.json")
             .then((response) => response.json())
             .then((data) => setProvinceData(data));
@@ -42,30 +46,71 @@ function ProvinceForm({ country }: { country: string }) {
         validateCity(province, value);
     };
 
+    const handleReload = () =>  window.location.reload();
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+            // Make the API call to your Next.js API route
+            const response = await fetch(`/api/weather?province=${province}&city=${city}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                setWeatherData(data);
+                setError("");
+            } else {
+                setWeatherData(null);
+                setError(data.error || "An unexpected error occurred");
+            }
+        } catch (error) {
+            setWeatherData(null);
+            setError("An error occurred while fetching weather data");
+        }
+    };
+
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-4">Select a Province in {country}</h2>
-            <input
-                type="text"
-                placeholder="Enter province"
-                value={province}
-                onChange={handleProvinceChange}
-                className="border px-4 py-2 rounded-lg mb-2 w-full"
-            />
-            {errors.province && <p className="text-red-500">{errors.province}</p>}
-
-            {province && !errors.province && (
-                <>
-                    <h2 className="text-xl font-semibold mb-4">Select a City in {province}</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label htmlFor="province">Province:</label>
                     <input
                         type="text"
-                        placeholder="Enter city"
-                        value={city}
-                        onChange={handleCityChange}
+                        id="province"
+                        value={province}
+                        onChange={handleProvinceChange}
+                        required
                         className="border px-4 py-2 rounded-lg mb-2 w-full"
                     />
-                    {errors.city && <p className="text-red-500">{errors.city}</p>}
-                </>
+                </div>
+                <div>
+                    <label htmlFor="city">City:</label>
+                    <input
+                        type="text"
+                        id="city"
+                        value={city}
+                        onChange={handleCityChange}
+                        required
+                        className="border px-4 py-2 rounded-lg mb-2 w-full"
+                    />
+                </div>
+                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">
+                    Get Weather
+                </button>
+                <button type="button" className="bg-yellow-500 text-black px-4 py-2 rounded-lg ml-4" onClick={handleReload}>
+                    Go Back
+                </button>
+            </form>
+
+            {error && <p className="text-red-500 mt-4">{error}</p>}
+
+            {weatherData && (
+                <div className="mt-4 px-4">
+                    <h3 className="text-xl font-semibold">Weather Data:</h3>
+                    {/* Display your weather data here */}
+                    <pre>{JSON.stringify(weatherData, null, 2)}</pre>
+                </div>
             )}
         </div>
     );
