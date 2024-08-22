@@ -5,10 +5,10 @@ function ProvinceForm({ country }: { country: string }) {
     const [city, setCity] = useState("");
     const [errors, setErrors] = useState({ province: "", city: "" });
     const [provinceData, setProvinceData] = useState<{ [key: string]: string[] }>({});
-    const [weatherData, setWeatherData] = useState(null);
+    const [aiOutput, setAiOutput] = useState(null);
     const [error, setError] = useState("");
-   
-    
+
+
     useEffect(() => {
         //state and city data is fetched from data.json 
         //for validation purpose
@@ -46,26 +46,37 @@ function ProvinceForm({ country }: { country: string }) {
         validateCity(province, value);
     };
 
-    const handleReload = () =>  window.location.reload();
+    const handleReload = () => window.location.reload();
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            // Make the API call to your Next.js API route
-            const response = await fetch(`/api/weather?province=${province}&city=${city}`);
-            const data = await response.json();
+            // Call the weather API
+            const weatherResponse = await fetch(`/api/weather?province=${province}&city=${city}`);
+            const weatherData = await weatherResponse.json();
 
-            if (response.ok) {
-                setWeatherData(data);
+            if (weatherResponse.ok) {
                 setError("");
+                // Pass the weather data to the AI API
+                const aiResponse = await fetch('/api/ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(weatherData), // Pass weather data here
+                });
+
+                const aiResult = await aiResponse.json();
+
+                if (aiResult.success) {
+                    console.log('AI Response:', aiResult.response);
+                } else {
+                    console.error('Error from AI API:', aiResult.error);
+                }
             } else {
-                setWeatherData(null);
-                setError(data.error || "An unexpected error occurred");
+                setError(weatherData.error || "An unexpected error occurred");
             }
         } catch (error) {
-            setWeatherData(null);
             setError("An error occurred while fetching weather data");
         }
     };
@@ -95,7 +106,7 @@ function ProvinceForm({ country }: { country: string }) {
                         className="border px-4 py-2 rounded-lg mb-2 w-full"
                     />
                 </div>
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">
+                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg" >
                     Get Weather
                 </button>
                 <button type="button" className="bg-yellow-500 text-black px-4 py-2 rounded-lg ml-4" onClick={handleReload}>
@@ -103,15 +114,7 @@ function ProvinceForm({ country }: { country: string }) {
                 </button>
             </form>
 
-            {error && <p className="text-red-500 mt-4">{error}</p>}
 
-            {weatherData && (
-                <div className="mt-4 px-4">
-                    <h3 className="text-xl font-semibold">Weather Data:</h3>
-                    {/* Display your weather data here */}
-                    <pre>{JSON.stringify(weatherData, null, 2)}</pre>
-                </div>
-            )}
         </div>
     );
 }

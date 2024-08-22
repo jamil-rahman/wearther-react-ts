@@ -6,10 +6,6 @@ export async function GET(req: Request) {
     const province = searchParams.get("province");
     const city = searchParams.get("city");
     const ow_api_key = process.env.OPENWEATHER_API_KEY
-    // const apiString: String=  "de90fe14cb428d162f190d719637fead";
-
-     console.log('API Key:', ow_api_key); 
-
 
     if (!city || !province) {
         return NextResponse.json({ error: 'City and province are required' }, { status: 400 });
@@ -27,9 +23,8 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'City not found' }, { status: 404 });
         }
 
-         const { lat, lon } = geoData[0];
+        const { lat, lon } = geoData[0];
       
-        console.log(geoData)
 
         //   Fetch the weather data using the geographic coordinates
         const weatherApi = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely&appid=${ow_api_key}`;
@@ -37,12 +32,12 @@ export async function GET(req: Request) {
         const weatherData = weatherResponse.data;
 
         // Return the weather data as JSON
-        return NextResponse.json(weatherData);
+        return NextResponse.json(weatherData.current);
         
     }
     catch (error) {
         // Handle errors (e.g., network issues, API errors)
-        console.log(error)
+        console.log("weather api",error)
         return NextResponse.json({ error: 'An error occurred while fetching weather data' }, { status: 500 });
     }
 }
