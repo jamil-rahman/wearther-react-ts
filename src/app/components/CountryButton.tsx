@@ -2,6 +2,7 @@
 import { useState } from "react";
 import ProvinceForm from "./MainApp";
 import StateForm from "./StateForm";
+import Image from "next/image";
 
 export default function CountryButton() {
     const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -23,7 +24,7 @@ export default function CountryButton() {
                             onClick={() => setSelectedCountry("Canada")}
                             className="bg-white text-gray-900 border-4 border-black-200 hover:text-white px-4 py-2 rounded-lg hover:bg-red-400 transition cursor-pointer flex items-center space-x-2"
                         >
-                            <img src="/canada.png" alt="Canada Flag" className="w-6 h-6 " />
+                            <Image src="/canada.png" alt="Canada Flag" width={30} height={30} />
                             <span>Canada</span>
                         </div>
                     </div>

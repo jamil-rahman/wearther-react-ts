@@ -7,7 +7,7 @@ import Image from 'next/image'
 export default function Footer() {
     return (
         <footer className='flex justify-center flex-col items-center bg-gray-600 text-white p-5'>
-            <p style={{ fontSize: '14px' }}>© 2024 Wearther. Made with
+            <p style={{ fontSize: '14px' }}>&copy; 2024 Wearther. Made with
                 <motion.span
                     animate={{ scale: [1, 1.2, 1] }}
                     transition={{
