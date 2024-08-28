@@ -51,8 +51,12 @@ export async function POST(req: Request) {
 
     try {
         const prompt = `The weather data for today in my city is as follows:
-        ${weatherSummary}, Based on this data, recommend a some combinations of clothings that I can pull of as my outfit for me to wear today or what should be I be carrying.
-        Give me a few options to choose from. I don't need technical details, just the outfit ideas.`;
+        ${weatherSummary}, Based on this data, give me a weather summary and recommend a some combinations 
+        of clothings that I can pull of as my outfit for me to wear today or what should be I be carrying.
+        Give me a few options to choose from. I don't need technical details, just the outfit ideas. Give me 
+        the output in a paragraph format. The tone should be jolly and cheerful. Don't include * or any asterisk in the output.
+        The summary should be in a separate pargaraph from the outfit ideas.
+        Suggest outfit for both males and females in separate pargaraphs.`;
 
         console.log("AI prompt", prompt);
 

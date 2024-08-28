@@ -1,17 +1,29 @@
 import { useEffect, useState } from "react";
+import WeatherWidget from "./WeatherWidget";
+import Loader from "./Loader";
+import TyperWriterEffect from "./TypeWriterEffect";
+import InputForm from "./InputForm";
+
+interface WeatherDetails {
+    temp: number;
+    weather: { description: string }[];
+    humidity: number;
+    wind_speed: number;
+    visibility: number;
+    feels_like: number;
+}
 
 function ProvinceForm({ country }: { country: string }) {
     const [province, setProvince] = useState("");
     const [city, setCity] = useState("");
     const [errors, setErrors] = useState({ province: "", city: "" });
     const [provinceData, setProvinceData] = useState<{ [key: string]: string[] }>({});
-    const [aiOutput, setAiOutput] = useState(null);
+    const [aiOutput, setAiOutput] = useState<string | null>(null);
+    const [weatherDetails, setWeatherDetails] = useState<null | WeatherDetails>(null);
     const [error, setError] = useState("");
-
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        //state and city data is fetched from data.json 
-        //for validation purpose
         fetch("/data.json")
             .then((response) => response.json())
             .then((data) => setProvinceData(data));
@@ -37,7 +49,7 @@ function ProvinceForm({ country }: { country: string }) {
         const value = e.target.value;
         setProvince(value);
         validateProvince(value);
-        setCity(""); // Reset city if province changes
+        setCity("");
     };
 
     const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,28 +60,31 @@ function ProvinceForm({ country }: { country: string }) {
 
     const handleReload = () => window.location.reload();
 
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
+
+        if (errors.province || errors.city) {
+            return;
+        }
 
         try {
-            // Call the weather API
             const weatherResponse = await fetch(`/api/weather?province=${province}&city=${city}`);
             const weatherData = await weatherResponse.json();
 
             if (weatherResponse.ok) {
+                setWeatherDetails(weatherData);
                 setError("");
-                // Pass the weather data to the AI API
                 const aiResponse = await fetch('/api/ai', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(weatherData), // Pass weather data here
+                    body: JSON.stringify(weatherData),
                 });
 
                 const aiResult = await aiResponse.json();
 
                 if (aiResult.success) {
-                    console.log('AI Response:', aiResult.response);
+                    setAiOutput(aiResult.response);
                 } else {
                     console.error('Error from AI API:', aiResult.error);
                 }
@@ -78,45 +93,49 @@ function ProvinceForm({ country }: { country: string }) {
             }
         } catch (error) {
             setError("An error occurred while fetching weather data");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="province">Province:</label>
-                    <input
-                        type="text"
-                        id="province"
-                        value={province}
-                        onChange={handleProvinceChange}
-                        required
-                        className="border px-4 py-2 rounded-lg mb-2 w-full"
-                    />
-                </div>
-                <div>
-                    <label htmlFor="city">City:</label>
-                    <input
-                        type="text"
-                        id="city"
-                        value={city}
-                        onChange={handleCityChange}
-                        required
-                        className="border px-4 py-2 rounded-lg mb-2 w-full"
-                    />
-                </div>
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg" >
-                    Get Weather
-                </button>
-                <button type="button" className="bg-yellow-500 text-black px-4 py-2 rounded-lg ml-4" onClick={handleReload}>
-                    Go Back
-                </button>
-            </form>
+        <div className="w-full px-4 max-w-md mx-auto">
+            <InputForm
+                province={province}
+                city={city}
+                errors={errors}
+                handleProvinceChange={handleProvinceChange}
+                handleCityChange={handleCityChange}
+                handleReload={handleReload}
+                handleSubmit={handleSubmit}
+            />
 
+            {loading && <Loader />}
 
+            {aiOutput && (
+                <div className="mt-4 px-4">
+                    <h2 className="text-lg font-semibold">AI Clothing Suggestions</h2>
+                    <TyperWriterEffect text={aiOutput.replace(/\*/g, '')} speed={4} />
+                </div>
+            )}
+
+            {weatherDetails && (
+                <>
+                    <h3 className="text-center mt-2 text-lg">At a Glance!</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+                        <WeatherWidget title="Temperature" text={(weatherDetails.temp - 273.15).toFixed(2) + " °C 🌡️"} />
+                        <WeatherWidget title="Conditions" text={weatherDetails.weather[0].description + " ☁️"} />
+                        <WeatherWidget title="Humidity" text={weatherDetails.humidity + "% 💧"} />
+                        <WeatherWidget title="Wind Speed" text={weatherDetails.wind_speed + " m/s 🌬️"} />
+                        <WeatherWidget title="Visibility" text={weatherDetails.visibility / 1000 + " kilometers 👁️"} />
+                        <WeatherWidget title="Feels Like" text={(weatherDetails.feels_like - 273.15).toFixed(2) + " °C 🌡️"} />
+                    </div>
+                </>
+            )}
         </div>
     );
+
+
 }
 
 export default ProvinceForm;
