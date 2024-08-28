@@ -20,7 +20,7 @@ export default function Footer() {
                      ❤️
                 </motion.span>
             </p>
-            <p>Let's connect 🔗</p>
+            <p>Let&apos;s connect 🔗</p>
             <div className='flex gap-2'>
                 <a href="https://www.linkedin.com/in/jamilurrahman96/">
                     <Image src="/linkedin.png" alt="LinkedIn Logo" width={20} height={20} />
