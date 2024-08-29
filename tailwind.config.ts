@@ -20,7 +20,8 @@ const config: Config = {
       },
       fontFamily: {
         raleway: ["Raleway", "sans-serif"],
-        kanit: ["Kanit", "sans-serif"], 
+        kanit: ["Kanit", "sans-serif"],
+        oxygen: ["Oxygen", "sans-serif"],
       },
     },
   },

@@ -8,7 +8,7 @@ export default function CountryButton() {
     const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
     return (
-        <div className="flex flex-col items-center justify-center mt-3 border p-20 w-100">
+        <div className="flex flex-col items-center justify-center mt-3 border p-14 md:p-20 w-100">
             {!selectedCountry && (
                 <div className="w-100">
                     <h2 className="text-2xl font-semibold mb-4">Where are you from?</h2>

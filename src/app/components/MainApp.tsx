@@ -99,7 +99,7 @@ function ProvinceForm({ country }: { country: string }) {
     };
 
     return (
-        <div className="w-full px-4 max-w-md mx-auto">
+        <div className="w-full md:px-2 max-w-md mx-auto">
             <InputForm
                 province={province}
                 city={city}
@@ -113,22 +113,29 @@ function ProvinceForm({ country }: { country: string }) {
             {loading && <Loader />}
 
             {aiOutput && (
-                <div className="mt-4 px-4">
-                    <h2 className="text-lg font-semibold">AI Clothing Suggestions</h2>
+                <div className="mt-4">
+                    <h2 className="md:text-2xl font-oxygen text-center font-semibold m-4">AI Clothing Suggests ✨</h2>
                     <TyperWriterEffect text={aiOutput.replace(/\*/g, '')} speed={4} />
+                    <p className="mt-2 text-center text-sm text-cyan-600 bold font-medium italic">
+                        Note: This suggestion is AI-generated. Please verify the information before heading out.
+                    </p>
                 </div>
             )}
 
             {weatherDetails && (
                 <>
-                    <h3 className="text-center mt-2 text-lg">At a Glance!</h3>
+                    <h3 className="md:text-2xl font-oxygen font-semibold text-center m-4">At a Glance 👓</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
-                        <WeatherWidget title="Temperature" text={(weatherDetails.temp - 273.15).toFixed(2) + " °C 🌡️"} />
-                        <WeatherWidget title="Conditions" text={weatherDetails.weather[0].description + " ☁️"} />
-                        <WeatherWidget title="Humidity" text={weatherDetails.humidity + "% 💧"} />
-                        <WeatherWidget title="Wind Speed" text={weatherDetails.wind_speed + " m/s 🌬️"} />
-                        <WeatherWidget title="Visibility" text={weatherDetails.visibility / 1000 + " kilometers 👁️"} />
-                        <WeatherWidget title="Feels Like" text={(weatherDetails.feels_like - 273.15).toFixed(2) + " °C 🌡️"} />
+                        {[
+                            { title: "Temperature", text: `${(weatherDetails.temp - 273.15).toFixed(2)} °C`, image: "/temperature.png", bg_path: "/temp-bg.jpg" },
+                            { title: "Conditions", text: `${weatherDetails.weather[0].description} `, image: "/conditions.png", bg_path: "/cloud-bg.jpg" },
+                            { title: "Humidity", text: `${weatherDetails.humidity}% `, image: "/humidity.png", bg_path: "/humidity-bg.jpg" },
+                            { title: "Wind Speed", text: `${weatherDetails.wind_speed} m/s `, image: "/wind-speed.png", bg_path: "/wind-bg.jpg" },
+                            { title: "Visibility", text: `${weatherDetails.visibility / 1000} kilometers `, image: "/visibility.png", bg_path: "/visibility-bg.jpg" },
+                            { title: "Feels Like", text: `${(weatherDetails.feels_like - 273.15).toFixed(2)}°`, image: "/feels_like.png", bg_path: "/feels-bg.jpg" },
+                        ].map((detail, index) => (
+                            <WeatherWidget key={index} title={detail.title} text={detail.text} image={detail.image} bg_path={detail.bg_path}/>
+                        ))}
                     </div>
                 </>
             )}
