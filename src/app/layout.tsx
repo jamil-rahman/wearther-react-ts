@@ -6,10 +6,7 @@ import Footer from "./components/Footer";
 
 export const metadata: Metadata = {
   title: "What to Wearther | Find the right fit for your day",
-  description: `Discover accurate weather forecasts tailored to your location with our 
-  AI-powered weather app. Get personalized clothing suggestions based on real-time weather data 
-  and be prepared for any weather conditions. Ideal for unpredictable climates, WW helps you 
-  stay comfortable and stylish every day.`,
+  description: `Discover accurate weather forecasts tailored to your location with our AI-powered weather app. Get personalized clothing suggestions based on real-time weather data and be prepared for any weather conditions. Ideal for unpredictable climates, Wearther helps you stay comfortable and stylish every day.`,
 };
 
 export default function RootLayout({
